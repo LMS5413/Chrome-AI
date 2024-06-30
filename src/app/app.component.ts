@@ -60,7 +60,13 @@ export class AppComponent implements OnInit {
             this.sendMessage();
           }
         });
-        this.session = await (window as any).ai.createTextSession();
+        try {
+          this.session = await (window as any).ai.createTextSession();
+        } catch (e) {
+          console.error(e);
+          this.isSupport = false;
+          this.isModalNotSupport = true;
+        }
       }
     }
   }
