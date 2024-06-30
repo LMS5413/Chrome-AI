@@ -42,7 +42,7 @@ To run the website locally, follow these steps:
 
 2. Navigate to the project directory:
     ```
-    cd your-repo
+    cd Chrome-AI
     ```
 
 3. Install the required dependencies:
