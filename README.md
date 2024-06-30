@@ -8,7 +8,10 @@
 This project uses future methods that leverage upcoming features and APIs that Google Chrome will be adding for AI tools.
 
 ### Technologies
-This website was built using [AngularJS](https://v17.angular.io/) and [Tailwind CSS](https://tailwindcss.com/)
+<div>
+    <p><a href="https://angular.dev/">Angular JS</a></p>
+    <p><a href="https://tailwindcss.com/">Tailwind CSS</a></p>
+</div
 
 
 ## Getting Started
