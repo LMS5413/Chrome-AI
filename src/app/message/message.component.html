@@ -1,0 +1,10 @@
+<div class="flex justify-start items-start mt-10" *ngIf="message.type === 'ai'">
+    <p class="text-sm font-semibold bg-blue-500 p-2 py-1 rounded-xl text-white {{ message.message.length > 40 ? 'w-1/2' : ''}}">
+        <markdown
+        [data]="message.message"
+        [disableSanitizer]="true">
+      </markdown></p>
+  </div>
+  <div class="flex justify-end items-end" *ngIf="message.type === 'user'">
+    <p class="text-sm font-semibold bg-gray-400 p-2 py-1 rounded-xl text-white {{ message.message.length > 40 ? 'w-1/2' : ''}}">{{ message.message }}</p>
+</div>

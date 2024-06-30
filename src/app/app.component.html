@@ -1,0 +1,55 @@
+<div class="flex justify-center items-center h-screen" *ngIf="isModalNotSupport">
+  <p-card header="Oh no!">
+    <p class="m-0">
+      Your browser does not support the Chrome AI. To use this chat, step into instructions below:
+    </p>
+    <div class="flex flex-col gap-2 mt-5">
+      <p>
+        1. Install Chrome <a href="https://www.google.com/intl/en-US/chrome/dev/" class="text-blue-600">Dev</a> or <a href="https://www.google.com/intl/en-US/chrome/canary/" class="text-blue-600">Canary</a> version
+      </p>
+      <p>
+        2. Enter the flag <a href="chrome://flags/#prompt-api-for-gemini-nano" class="text-blue-600">chrome://flags/#prompt-api-for-gemini-nanos</a> and select 'Enabled' in the dropdown
+      </p>
+      <p>
+        3. Enter the flag <a href="chrome://flags/#optimization-guide-on-device-model" class="text-blue-600">chrome://flags/#optimization-guide-on-device-model</a> and select 'Enabled BypassPrefRequirement' in the dropdown and restart the browser
+      </p>
+      <p>
+        4. Enter the flag <a href="chrome://components" class="text-blue-600">chrome://components</a> and update the 'Optimization Guide On Device Model' to the latest version, if not appears, check the previous steps
+      </p>
+      <p>
+        5. Restart the browser and open the chat again
+      </p>
+    </div>
+  </p-card>
+</div>
+<div class="container flex mx-auto justify-center h-screen overflow-hidden" *ngIf="isSupport">
+  <div class="flex flex-col h-full w-full">
+    <div class="flex-grow overflow-auto" *ngIf="!history.length">
+      <div class="flex flex-col items-center justify-center h-full">
+        <h1 class="text-4xl">Hello, welcome to the chat</h1>
+        <p class="text-lg">This project has been made with Angular.JS and Chrome AI provider</p>
+        <p class="text-lg">Please, write something to start the chat</p>
+      </div>
+    </div>
+    <div class="flex flex-col flex-grow overflow-auto gap-5 p-5 lg:px-72" *ngIf="history.length > 0">
+      <div class="flex flex-col gap-2" *ngFor="let message of history">
+        <app-message [message]="message"></app-message>
+      </div>
+      <div class="mt-32"></div> <!-- Placeholder para espaço abaixo das mensagens -->
+    </div>
+    <div class="flex flex-row gap-5 fixed bottom-0 left-0 w-full p-5 bg-white justify-center items-center">
+      <textarea
+        rows="2"
+        cols="40"
+        pInputTextarea
+        [autoResize]="false"
+        (ngModel)="(a)"
+        class="resize-none border-black border-2"
+        id="message"
+        [value]="''"
+      ></textarea>
+      <p-button label="Send" styleClass="bg-blue-500 text-white p-2 hover:bg-blue-600" (onClick)="sendMessage()" [disabled]="this.inAnswing"></p-button>
+      <p-button label="Clear" styleClass="bg-red-500 text-white p-2 hover:bg-red-600" (onClick)="clearMessage()" [disabled]="this.inAnswing" *ngIf="this.history.length"></p-button>
+    </div>
+  </div>
+</div>
