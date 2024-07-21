@@ -13,6 +13,7 @@ import { CardModule } from 'primeng/card';
 import { chromeai } from 'chrome-ai';
 import { generateText, streamText } from 'ai';
 import { MessageComponent } from './message/message.component';
+import { checkBrowser } from '../utils/checkBrowser';
 
 @Component({
   selector: 'app-root',
@@ -102,19 +103,7 @@ export class AppComponent implements OnInit {
   }
 
   async checkBrowser() {
-    try {
-      await generateText({
-        model: chromeai(),
-        prompt: '',
-      });
-      return true;
-    } catch (e: any) {
-      console.log('Real Error:', e.message);
-      if (e.message === 'Browser not support') {
-        return false;
-      }
-      return true;
-    }
+    return await checkBrowser();
   }
 
   private async getResponse(text: string) {
