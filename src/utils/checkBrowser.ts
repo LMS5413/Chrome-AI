@@ -3,7 +3,7 @@ export async function checkBrowser(): Promise<boolean> {
     const version = getChromeVersion();
   
     const ai = (window as any).ai;
-    const state = await ai?.canCreateGenericSession();
+    const state = await ai?.canCreateTextSession();
     return version < 127 || state === "readily";
 }
 
