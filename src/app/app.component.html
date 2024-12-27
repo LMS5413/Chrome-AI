@@ -69,7 +69,7 @@
         [disabled]="isAnswer"
       ></p-button>
       <p-button 
-        *ngIf="history.length" 
+        *ngIf="history.length > 1" 
         label="Clear"
         severity="danger"
         (onClick)="clearMessage()" 

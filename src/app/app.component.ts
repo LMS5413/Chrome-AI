@@ -22,7 +22,6 @@ import { definePreset } from '@primeng/themes';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   imports: [
-    RouterOutlet,
     TextareaModule,
     NgIf,
     ButtonModule,
