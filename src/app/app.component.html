@@ -1,55 +1,81 @@
-<div class="flex justify-center items-center h-screen" *ngIf="isModalNotSupport">
+<div *ngIf="isModalNotSupport" class="flex justify-center items-center h-screen">
   <p-card header="Oh no!">
     <p class="m-0">
-      Your browser does not support the Chrome AI. To use this chat, step into instructions below:
+      Your browser does not support the Chrome AI. To use this chat, follow the steps below:
     </p>
     <div class="flex flex-col gap-2 mt-5">
       <p>
-        1. Install Chrome <a href="https://www.google.com/intl/en-US/chrome/dev/" class="text-blue-600">Dev</a> or <a href="https://www.google.com/intl/en-US/chrome/canary/" class="text-blue-600">Canary</a> version
+        1. Install Chrome 
+        <a href="https://www.google.com/intl/en-US/chrome/dev/" class="text-blue-600" target="_blank" rel="noopener">Dev</a> 
+        or 
+        <a href="https://www.google.com/intl/en-US/chrome/canary/" class="text-blue-600" target="_blank" rel="noopener">Canary</a> version.
       </p>
       <p>
-        2. Enter the flag <a href="chrome://flags/#prompt-api-for-gemini-nano" class="text-blue-600">chrome://flags/#prompt-api-for-gemini-nanos</a> and select 'Enabled' in the dropdown
+        2. Enter the flag 
+        <a href="chrome://flags/#prompt-api-for-gemini-nano" class="text-blue-600">chrome://flags/#prompt-api-for-gemini-nanos</a> 
+        and select 'Enabled'.
       </p>
       <p>
-        3. Enter the flag <a href="chrome://flags/#optimization-guide-on-device-model" class="text-blue-600">chrome://flags/#optimization-guide-on-device-model</a> and select 'Enabled BypassPrefRequirement' in the dropdown and restart the browser
+        3. Enter the flag 
+        <a href="chrome://flags/#optimization-guide-on-device-model" class="text-blue-600">chrome://flags/#optimization-guide-on-device-model</a> 
+        and select 'Enabled BypassPrefRequirement', then restart the browser.
       </p>
       <p>
-        4. Enter the flag <a href="chrome://components" class="text-blue-600">chrome://components</a> and update the 'Optimization Guide On Device Model' to the latest version, if not appears, check the previous steps
+        4. Go to 
+        <a href="chrome://components" class="text-blue-600">chrome://components</a> 
+        and update the 'Optimization Guide On Device Model' to the latest version. If it doesn't appear, revisit the previous steps.
       </p>
-      <p>
-        5. Restart the browser and open the chat again
-      </p>
+      <p>5. Restart the browser and open the chat again.</p>
     </div>
   </p-card>
 </div>
-<div class="container flex mx-auto justify-center h-screen overflow-hidden" *ngIf="isSupport">
-  <div class="flex flex-col h-full w-full">
-    <div class="flex-grow overflow-auto" *ngIf="!history.length">
-      <div class="flex flex-col items-center justify-center h-full">
-        <h1 class="text-4xl">Hello, welcome to the chat</h1>
-        <p class="text-lg">This project has been made with Angular.JS and Chrome AI provider</p>
-        <p class="text-lg">Please, write something to start the chat</p>
+
+<div *ngIf="!isModalNotSupport && !isSessionCreated" class="flex justify-center items-center h-screen">
+  <div class="text-center">
+    <h1 class="text-4xl">Creating session. Please wait...</h1>
+  </div>
+</div>
+
+<div *ngIf="!isModalNotSupport && isSessionCreated" class="container mx-auto h-screen overflow-hidden">
+  <div class="flex flex-col h-full">
+    <div *ngIf="history.length === 1" class="flex-grow flex flex-col text-center items-center justify-center gap-5">
+      <h1 class="text-4xl">Hello, welcome to the chat</h1>
+      <div>
+        <p class="text-lg">This project was built with Angular and Chrome AI provider</p>
+        <p class="text-lg">Please, write something to start the chat.</p>
       </div>
     </div>
-    <div class="flex flex-col flex-grow overflow-auto gap-5 p-5 lg:px-72" *ngIf="history.length > 0">
-      <div class="flex flex-col gap-2" *ngFor="let message of history">
+
+    <div *ngIf="history.length > 1" class="flex-grow flex flex-col gap-5 xl:px-[24rem] py-10 p-5 overflow-auto">
+      <div *ngFor="let message of history" class="flex flex-col gap-2">
         <app-message [message]="message"></app-message>
       </div>
-      <div class="mt-32"></div> <!-- Placeholder para espaço abaixo das mensagens -->
+      <div class="mt-32"></div>
     </div>
-    <div class="flex flex-row gap-5 fixed bottom-0 left-0 w-full p-5 bg-white justify-center items-center">
+    <div class="fixed bottom-0 left-0 w-full bg-white flex flex-row gap-2 p-5 mb-8 justify-center items-center">
       <textarea
-        rows="2"
-        cols="40"
-        pInputTextarea
-        [autoResize]="false"
-        (ngModel)="(a)"
-        class="resize-none border-black border-2"
+        pTextarea
         id="message"
-        [value]="''"
+        rows="2"
+        cols="50"
+        class="resize-none"
+        [autoResize]="false"
+        placeholder="Type your message..."
+        aria-label="Message input"
       ></textarea>
-      <p-button label="Send" styleClass="bg-blue-500 text-white p-2 hover:bg-blue-600" (onClick)="sendMessage()" [disabled]="this.inAnswing"></p-button>
-      <p-button label="Clear" styleClass="bg-red-500 text-white p-2 hover:bg-red-600" (onClick)="clearMessage()" [disabled]="this.inAnswing" *ngIf="this.history.length"></p-button>
+      <p-button 
+        label="Send" 
+        (onClick)="sendMessage()" 
+        [disabled]="isAnswer"
+      ></p-button>
+      <p-button 
+        *ngIf="history.length" 
+        label="Clear"
+        severity="danger"
+        (onClick)="clearMessage()" 
+        [disabled]="isAnswer"
+      ></p-button>
     </div>
+    <p class="text-center text-sm justify-center mb-3 items-center text-gray-500">This AI can make mistakes. Check important info. (Tokens per second: {{this.tokensPerSecond}} Tokens: {{this.tokens}})</p>
   </div>
 </div>

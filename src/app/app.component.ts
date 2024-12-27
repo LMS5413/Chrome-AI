@@ -7,13 +7,14 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ButtonModule } from 'primeng/button';
+import { TextareaModule } from 'primeng/textarea';
 import { CardModule } from 'primeng/card';
-import { chromeai } from 'chrome-ai';
-import { generateText, streamText } from 'ai';
 import { MessageComponent } from './message/message.component';
-import { checkBrowser } from '../utils/checkBrowser';
+import { AIService } from '../services/AIService';
+import { PrimeNG } from 'primeng/config';
+import Aura from '@primeng/themes/aura';
+import { definePreset } from '@primeng/themes';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,7 @@ import { checkBrowser } from '../utils/checkBrowser';
   styleUrl: './app.component.css',
   imports: [
     RouterOutlet,
-    InputTextareaModule,
+    TextareaModule,
     NgIf,
     ButtonModule,
     NgFor,
@@ -33,42 +34,68 @@ import { checkBrowser } from '../utils/checkBrowser';
 @Injectable()
 export class AppComponent implements OnInit {
   title = 'ChromeAI';
-  a = 1;
   history: {
     type: string;
     message: string;
   }[] = [];
 
-  private model = chromeai('generic', {
-    topK: 5,
-    temperature: 0.5,
+  isModalNotSupport = false;
+  isAnswer = false;
+  isSessionCreated = false;
+  tokensPerSecond = 0;
+  tokens = 0;
+
+  private preset = definePreset(Aura, {
+    semantic: {
+        primary: {
+            50: '{blue.50}',
+            100: '{blue.100}',
+            200: '{blue.200}',
+            300: '{blue.300}',
+            400: '{blue.400}',
+            500: '{blue.500}',
+            600: '{blue.600}',
+            700: '{blue.700}',
+            800: '{blue.800}',
+            900: '{blue.900}',
+            950: '{blue.950}'
+        }
+    }
   });
 
-  isSupport = false;
-  isModalNotSupport = false;
-  inAnswing = false;
-  private session: any;
-
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private aiService: AIService,
+    private primeng: PrimeNG
+  ) {
+    this.primeng.theme.set({
+      preset: this.preset,
+      options: {
+        cssLayer: {
+          name: 'primeng',
+          order: 'tailwind-base, primeng, tailwind-utilities',
+        },
+        darkModeSelector: false
+      },
+    });
+  }
 
   async ngOnInit(): Promise<void> {
+    this.primeng.ripple.set(true);
     if (isPlatformBrowser(this.platformId)) {
-      this.isSupport = await this.checkBrowser();
-      this.isModalNotSupport = !this.isSupport;
-      if (this.isSupport) {
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            this.sendMessage();
-          }
-        });
-        try {
-          this.session = await (window as any).ai.createTextSession();
-        } catch (e) {
-          console.error(e);
-          this.isSupport = false;
-          this.isModalNotSupport = true;
-        }
+      if (!this.aiService.checkBrowser()) {
+        this.isModalNotSupport = true;
+        return;
       }
+
+      this.history.push({
+        type: "system",
+        message: "You are a friendly AI. Your function is to help users with their questions. You can answer questions about programming, math, science, and more. This array sent is your history of messages. You can use this to keep track of the conversation.",
+      });
+
+      console.log('Creating session');
+      await this.aiService.createSession();
+      this.isSessionCreated = true;
     }
   }
 
@@ -78,17 +105,9 @@ export class AppComponent implements OnInit {
     if (!text) {
       return;
     }
-    this.history.push({
-      type: 'user',
-      message: text,
-    });
-
-    this.history.push({
-      type: 'ai',
-      message: '',
-    });
     this.resetText();
-    this.getResponse(text);
+    this.history.push({ type: 'user', message: text });
+    this.getResponse(`HISTORY:${JSON.stringify(this.history)}\n\n:PROMPT ${text}`);
   }
 
   resetText() {
@@ -99,26 +118,50 @@ export class AppComponent implements OnInit {
   }
 
   clearMessage() {
-    this.history = [];
-  }
-
-  async checkBrowser() {
-    return await checkBrowser();
+    this.history = [this.history.find((item) => item.type !== 'system')!!];
   }
 
   private async getResponse(text: string) {
+    this.history.push({ type: 'ai', message: '' });
     const object = this.history[this.history.length - 1];
+    
+    let startTime = Date.now(); // Tempo de início da requisição
+    let tokenCount = 0; // Contador de tokens
+    let lastTime = startTime; // Marca o último tempo para calcular os tokens por segundo em intervalos
+    
     try {
-      this.inAnswing = true;
-      const stream = this.session.promptStreaming(text);
+      this.isAnswer = true;
+      const stream = await this.aiService.prompt(text);
+  
       for await (const response of stream) {
-        object.message = response.replace('```c#', '```csharp');
+        object.message += response.replace('```c#', '```csharp');
+        
+        let tokensInCurrentResponse = response.split(/\s+/).length;
+        tokenCount += tokensInCurrentResponse;
+  
+        let currentTime = Date.now();
+        let elapsedTime = (currentTime - lastTime) / 1000;
+  
+        if (elapsedTime > 0) {
+          let tokensPerSecond = tokensInCurrentResponse / elapsedTime;
+          this.tokensPerSecond = Math.round(tokensPerSecond);
+          this.tokens = tokenCount;
+        }
+  
+        lastTime = currentTime;
       }
-      this.inAnswing = false;
+  
+      let totalTime = (Date.now() - startTime) / 1000;
+      let tokensPerSecondTotal = Math.round(tokenCount / totalTime);
+      this.tokensPerSecond = tokensPerSecondTotal;
+      this.tokens = tokenCount;
+  
+      this.isAnswer = false;
     } catch (e) {
-      object.message = 'An error occurred while processing the request. See the console for more information.';
+      object.message =
+        'An error occurred while processing the request. See the console for more information.';
       console.error(e);
-      this.inAnswing = false;
+      this.isAnswer = false;
     }
   }
 }
