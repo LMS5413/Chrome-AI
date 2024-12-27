@@ -24,7 +24,7 @@ To start using the website's AI-powered features, follow these steps:
 
 3. Enter the flag `chrome://flags/#optimization-guide-on-device-model` and select `Enabled BypassPrefRequirement`
 
-4. Restart the browser and enter the flag `chrome://components` and update `Optimization Guide On Device Model` component.
+4. Enter the flag `chrome://flags/#text-safety-classifier` and disable this option
 
 5. Enter the [website](https://chrome-ai-eight.vercel.app/) and enjoy!
 
@@ -50,7 +50,7 @@ To run the website locally, follow these steps:
 
 3. Install the required dependencies:
     ```
-    bun install
+    npm i
     ```
 
 4. Start the local development server:
