@@ -10,5 +10,5 @@
 }
 
 a {
-    color: blue;
+    color: rgb(37 99 235 / var(--tw-text-opacity, 1));;
 }
