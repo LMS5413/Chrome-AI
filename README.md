@@ -1,9 +1,5 @@
 # Chrome AI - A website that utilizes Browser AI
 
-<p align="center">
-  <img src="https://i.imgur.com/nyhERRt.jpeg" width="400" />
-</p>
-
 
 This project uses future methods that leverage upcoming features and APIs that Google Chrome will be adding for AI tools.
 
