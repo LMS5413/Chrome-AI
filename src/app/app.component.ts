@@ -6,7 +6,6 @@ import {
   OnInit,
   PLATFORM_ID,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TextareaModule } from 'primeng/textarea';
 import { CardModule } from 'primeng/card';
@@ -89,12 +88,17 @@ export class AppComponent implements OnInit {
 
       this.history.push({
         type: "system",
-        message: "You are a friendly AI. Your function is to help users with their questions. You can answer questions about programming, math, science, and more. This array sent is your history of messages. You can use this to keep track of the conversation.",
+        message: "\\english\\ You are a helpful assistant. Follow these rules: 1) Respond in the user's language. 2) Keep answers short and simple. 3) Use clear line breaks for readability. 4) For code, use blocks: \\csharp\\ example \\ 5) Explain step by step. Example: \"Your code is a puzzle. Each line is a piece.\"" 
       });
 
       console.log('Creating session');
-      await this.aiService.createSession();
-      this.isSessionCreated = true;
+      try {
+        await this.aiService.createSession();
+        this.isSessionCreated = true;
+      } catch (e) {
+        this.isModalNotSupport = true;
+        console.error(e);
+      }
     }
   }
 
@@ -124,16 +128,16 @@ export class AppComponent implements OnInit {
     this.history.push({ type: 'ai', message: '' });
     const object = this.history[this.history.length - 1];
     
-    let startTime = Date.now(); // Tempo de início da requisição
-    let tokenCount = 0; // Contador de tokens
-    let lastTime = startTime; // Marca o último tempo para calcular os tokens por segundo em intervalos
+    let startTime = Date.now();
+    let tokenCount = 0;
+    let lastTime = startTime;
     
     try {
       this.isAnswer = true;
       const stream = await this.aiService.prompt(text);
   
       for await (const response of stream) {
-        object.message += response.replace('```c#', '```csharp');
+        object.message += response.replaceAll("\n", "<br>");
         
         let tokensInCurrentResponse = response.split(/\s+/).length;
         tokenCount += tokensInCurrentResponse;

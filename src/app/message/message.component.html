@@ -1,9 +1,12 @@
 <div class="flex justify-start items-start mt-10" *ngIf="message.type === 'ai'">
-    <p class="text-lg p-2 py-1 rounded-xl w-3/4">
-        <markdown
-        [data]="message.message">
-        </markdown></p>
-  </div>
-  <div class="flex justify-end items-end" *ngIf="message.type === 'user'">
-    <p class="text-lg bg-gray-400 p-2 py-1 rounded-xl items-center justify-center text-white break-words text-start">{{ message.message }}</p>
+  <p class="text-lg p-2 py-1 rounded-xl">
+    <markdown [data]="message.message"> </markdown>
+  </p>
+</div>
+<div class="flex justify-end items-end" *ngIf="message.type === 'user'">
+  <p
+    class="text-base bg-gray-400 px-3 py-1 rounded-xl items-center justify-center text-white break-words text-start"
+  >
+    {{ message.message }}
+  </p>
 </div>
