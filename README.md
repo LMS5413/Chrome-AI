@@ -1,5 +1,9 @@
 # Chrome AI - A website that utilizes Browser AI
 
+# This Chrome-AI project has been discontinued. Google removed the window.ai API from the Dev and Canary versions of the browser.
+
+# The main reason for its discontinuation is that the experimental API did not meet long-term stability and security requirements. In addition, Google decided to focus its efforts on more standardized and widely adopted AI integration approaches, ensuring better compatibility across platforms and avoiding fragmentation in the developer ecosystem
+
 
 This project uses future methods that leverage upcoming features and APIs that Google Chrome will be adding for AI tools.
 
